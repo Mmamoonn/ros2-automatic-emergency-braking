@@ -1,0 +1,78 @@
+#  .gitignore — ROS 2 Automatic Emergency Braking Project
+
+# ── ROS 2 / colcon build artifacts ───────────────────────────────────────────
+build/
+install/
+log/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.colcon_build.rc
+colcon_command_prefix_*.sh
+colcon_command_prefix_*.sh.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+*.py[cod]
+*$py.class
+*.so
+.Python
+dist/
+wheels/
+*.egg
+MANIFEST
+.env
+.venv
+venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ── ROS 2 logs ────────────────────────────────────────────────────────────────
+~/.ros/log/
+*.log
+roscore.pid
+
+# ── Gazebo / simulation artifacts ────────────────────────────────────────────
+*.world~
+*.sdf~
+.gazebo/
+
+# ── CMake ─────────────────────────────────────────────────────────────────────
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+CTestTestfile.cmake
+install_manifest.txt
+_deps/
+
+# ── IDE & editors ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.code-workspace
+
+# ── Doxygen ───────────────────────────────────────────────────────────────────
+docs/html/
+docs/xml/
+docs/latex/
+
+# ── Miscellaneous ─────────────────────────────────────────────────────────────
+*.bak
+*.orig
+*.tmp
+*.bag
+*.db3
+rosbag2_*/
