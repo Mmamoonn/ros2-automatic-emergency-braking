@@ -23,8 +23,9 @@ setup(
         ],
     },
     entry_points={
-    'console_scripts': [
-        'safety_node = safety_node.safety_node:main',
-		],
-	},
+        'console_scripts': [
+            'safety_node = safety_node.safety_node:main',
+            'auto_driver = safety_node.auto_driver:main'
+        ],
+    },
 )
