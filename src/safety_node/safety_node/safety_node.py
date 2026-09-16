@@ -53,6 +53,10 @@ class SafetyNode(Node):
         self.create_subscription(
             Odometry, '/odom', self.odom_callback, 10
         )
+        # Listen to the automated driver
+        self.create_subscription(
+            TwistStamped, '/drive_cmd', self.drive_callback, 10
+        )
 
         # ── publisher ─────────────────────────────────────────────────────────
         self.drive_pub = self.create_publisher(TwistStamped, '/cmd_vel', 10)
@@ -78,7 +82,14 @@ class SafetyNode(Node):
           5. Mask to forward arc only.
           6. Brake if min(iTTC) < threshold.
         """
-
+# ── drive command callback ────────────────────────────────────────────────
+    def drive_callback(self, msg: TwistStamped) -> None:
+        """
+        Pass through driving commands to the wheels ONLY if we are not 
+        currently executing an emergency brake.
+        """
+        if not self.braking:
+            self.drive_pub.publish(msg)
         # ── Step 1 — clean ranges ─────────────────────────────────────────────
         ranges = np.array(msg.ranges, dtype=np.float64)
 
