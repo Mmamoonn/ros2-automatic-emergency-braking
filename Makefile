@@ -66,21 +66,26 @@ safety-tune:
 	@$(SETUP) && ros2 run safety_node safety_node \
 		--ros-args -p ittc_threshold:=$(or $(THRESHOLD),0.8)
 
-# ── launch ALL three in separate gnome-terminal tabs 
+# ── launch ALL three in separate tilix-terminal tabs 
+# ── launch ALL three in separate terminals (Manual Control)
 run-all:
-	@echo "Opening all terminals..."
-	@gnome-terminal \
-		--tab --title="Gazebo Sim"    -- bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" \
-		--tab --title="Teleop"        -- bash -c "sleep 4 && $(SETUP) && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true; exec bash" \
-		--tab --title="Safety Node"   -- bash -c "sleep 5 && $(SETUP) && ros2 run safety_node safety_node; exec bash" \
-	|| \
-	xterm -T "Gazebo Sim"  -e "bash -c '$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash'" & \
-	sleep 4 && \
-	xterm -T "Teleop"      -e "bash -c '$(SETUP) && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true; exec bash'" & \
-	sleep 1 && \
-	xterm -T "Safety Node" -e "bash -c '$(SETUP) && ros2 run safety_node safety_node; exec bash'" &
-	@echo "All terminals launched."
+	@echo "Opening manual teleop environment..."
+	@tilix -e bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" &
+	@sleep 4
+	@tilix -e bash -c "$(SETUP) && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true; exec bash" &
+	@sleep 2
+	@tilix -e bash -c "$(SETUP) && ros2 run safety_node safety_node; exec bash" &
+	@echo "Manual terminals launched."
 
+# ── launch automated AEB test (Autonomous Control)
+test-aeb:
+	@echo "Opening AEB Automated Test Environment..."
+	@tilix -e bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" &
+	@sleep 4
+	@tilix -e bash -c "$(SETUP) && ros2 run safety_node safety_node; exec bash" &
+	@sleep 2
+	@tilix -e bash -c "$(SETUP) && ros2 run safety_node auto_driver; exec bash" &
+	@echo "Automated test launched. Watch out for the walls!"	
 # ── monitor topics live
 monitor:
 	@echo "Active topics:"
@@ -106,7 +111,8 @@ help:
 	@echo "  make safety         Launch AEB safety node"
 	@echo "  make safety-tune    Launch with custom threshold"
 	@echo "                      e.g.  make safety-tune THRESHOLD=1.2"
-	@echo "  make run-all        Open all 3 terminals at once"
+	@echo "  make run-all        Open all 3 terminals at once (manual control)"
+	@echo "  make test-aeb        Open all 3 terminals at once (autonomous control)"
 	@echo "  make monitor        Watch /cmd_vel brake commands live"
 	@echo "  make hz             Check /scan publish rate"
 	@echo "  ─────────────────────────────────────────────────────"
