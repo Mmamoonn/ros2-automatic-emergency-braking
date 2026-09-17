@@ -71,6 +71,15 @@ class SafetyNode(Node):
         """Store the robot's forward (longitudinal) speed."""
         self.speed = msg.twist.twist.linear.x
 
+   # ── drive command callback ────────────────────────────────────────────────
+    def drive_callback(self, msg: TwistStamped) -> None:
+        """
+        Pass through driving commands to the wheels ONLY if we are not 
+        currently executing an emergency brake.
+        """
+        if not self.braking:
+            self.drive_pub.publish(msg)
+
     # ── scan callback — core AEB logic ────────────────────────────────────────
     def scan_callback(self, msg: LaserScan) -> None:
         """
@@ -82,14 +91,7 @@ class SafetyNode(Node):
           5. Mask to forward arc only.
           6. Brake if min(iTTC) < threshold.
         """
-# ── drive command callback ────────────────────────────────────────────────
-    def drive_callback(self, msg: TwistStamped) -> None:
-        """
-        Pass through driving commands to the wheels ONLY if we are not 
-        currently executing an emergency brake.
-        """
-        if not self.braking:
-            self.drive_pub.publish(msg)
+
         # ── Step 1 — clean ranges ─────────────────────────────────────────────
         ranges = np.array(msg.ranges, dtype=np.float64)
 
@@ -99,7 +101,7 @@ class SafetyNode(Node):
         # Clamp below minimum sensing distance (avoids spurious readings)
         ranges = np.where(ranges >= MIN_RANGE_FILTER, ranges, msg.range_max)
 
-        # ── Step 2 — beam angles ──────────────────────────────────────────────
+        # ── Step 2 — beam angles  ──────────────────────────────────────────────
         n = len(ranges)
         angles = msg.angle_min + np.arange(n) * msg.angle_increment   # [rad]
 
