@@ -66,26 +66,26 @@ safety-tune:
 	@$(SETUP) && ros2 run safety_node safety_node \
 		--ros-args -p ittc_threshold:=$(or $(THRESHOLD),0.8)
 
-# ── launch ALL three in separate tilix-terminal tabs 
-# ── launch ALL three in separate terminals (Manual Control)
+# ── launch ALL three in a single split Tilix window (Manual Control)
 run-all:
-	@echo "Opening manual teleop environment..."
-	@tilix -e bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" &
+	@echo "Opening manual teleop environment in split panes..."
+	@tilix -a app-new-session -e bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" &
 	@sleep 4
-	@tilix -e bash -c "$(SETUP) && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true; exec bash" &
+	@tilix -a session-add-right -e bash -c "$(SETUP) && ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true; exec bash" &
 	@sleep 2
-	@tilix -e bash -c "$(SETUP) && ros2 run safety_node safety_node; exec bash" &
-	@echo "Manual terminals launched."
+	@tilix -a session-add-down -e bash -c "$(SETUP) && ros2 run safety_node safety_node; exec bash" &
+	@echo "Manual split terminals launched."
 
 # ── launch automated AEB test (Autonomous Control)
 test-aeb:
-	@echo "Opening AEB Automated Test Environment..."
-	@tilix -e bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" &
+	@echo "Opening AEB Automated Test Environment in split panes..."
+	@tilix -a app-new-session -e bash -c "$(SETUP) && ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py; exec bash" &
 	@sleep 4
-	@tilix -e bash -c "$(SETUP) && ros2 run safety_node safety_node; exec bash" &
+	@tilix -a session-add-right -e bash -c "$(SETUP) && ros2 run safety_node safety_node; exec bash" &
 	@sleep 2
-	@tilix -e bash -c "$(SETUP) && ros2 run safety_node auto_driver; exec bash" &
-	@echo "Automated test launched. Watch out for the walls!"	
+	@tilix -a session-add-down -e bash -c "$(SETUP) && ros2 run safety_node auto_driver; exec bash" &
+	@echo "Automated test launched!"
+	
 # ── monitor topics live
 monitor:
 	@echo "Active topics:"
